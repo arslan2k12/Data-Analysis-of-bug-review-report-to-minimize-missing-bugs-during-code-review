@@ -1,0 +1,94 @@
+---
+title: "Finding Out Specific Reasons Behind Missing Bugs During Code Review "
+output: html_notebook
+---
+
+Author: Arslan Ahmed
+
+Language: R
+
+Tool: RStudio
+
+Date: 01-12-17
+
+Dataset:
+
+We take the following predictive variables into consideration:
+1) lines
+2) chunks
+3) file_count
+4) r_queue
+5) r_exp
+6) r_exp_product
+7) s_exp
+8) s_exp_product
+
+We predict the following variables:
+1) review_time_minutes (how much time does reviewer take to review the code)
+2) is_bad (whether his review is good or bad)
+
+We analyze the effect of all the predictor variables on each of the two predicted variables separately.
+Purpose is to identify the most important predictor Variables for each of the predicted variables.
+
+
+```{r}
+#read data from CSV file
+reviewData <- read.csv("F:/OneDrive - Carleton University/CANADA/Carleton Study/Raman Project/db/newset_6months.csv")
+```
+
+```{r}
+#remove missing values, if any
+reviewData <- na.omit(reviewData)
+```
+
+```{r}
+#use caret library of R (Classification and Regression Training)
+library(caret)
+```
+
+```{r}
+summary(reviewData)
+```
+
+```{r}
+set.seed(1)
+
+# Scale predictors.
+lines.c = scale(reviewData$lines, center=TRUE, scale=TRUE)
+chunks.c = scale(reviewData$chunks, center=TRUE, scale=TRUE)
+file_count.c = scale(reviewData$file_count, center=TRUE, scale=TRUE)
+r_queue.c = scale(reviewData$r_queue, center=TRUE, scale=TRUE)
+r_exp.c = scale(reviewData$r_exp, center=TRUE, scale=TRUE)
+r_exp_product.c = scale(reviewData$r_exp_product, center=TRUE, scale=TRUE)
+s_exp.c = scale(reviewData$s_exp, center=TRUE, scale=TRUE)
+s_exp_product.c = scale(reviewData$s_exp_product, center=TRUE, scale=TRUE)
+
+# bind these new variables into previous data and display a summary.
+new.c.vars = cbind(lines.c, chunks.c, file_count.c, r_queue.c, r_exp.c, r_exp_product.c, s_exp.c, s_exp_product.c)
+newReviewData = cbind(reviewData, new.c.vars)
+names(newReviewData)[11:18] = c("lines.c", "chunks.c", "file_count.c", "r_queue.c", "r_exp.c", "r_exp_product.c", "s_exp.c", "s_exp_product.c")
+summary(newReviewData)
+```
+
+```{r}
+# fit a linear model for is_bad, and run a summary of its results.
+modIsBad = lm(is_bad ~ lines.c + chunks.c + file_count.c + r_queue.c + r_exp.c + r_exp_product.c + s_exp.c + s_exp_product.c, data=newReviewData)
+summary(modIsBad)
+```
+Based on the obove outputs, we see that the following are the three most important predictor variables to predict is_bad variable:
+
+1) lines
+2) r_exp
+3) chunks
+
+```{r}
+# fit a linear model for review_time_minutes, and run a summary of its results.
+modMinutes = lm(review_time_minutes ~ lines.c + chunks.c + file_count.c + r_queue.c + r_exp.c + r_exp_product.c + s_exp.c + s_exp_product.c, data=newReviewData)
+summary(modMinutes)
+```
+
+Based on the obove outputs, we see that the following are the three most important predictor variables to predict review_time_minutes variable:
+
+1) s_exp_product
+2) r_queue
+3) s_exp
