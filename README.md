@@ -15,4 +15,6 @@ We predict the following variables: 1) review_time_minutes (how much time does r
 
 We analyze the effect of all the predictor variables on each of the two predicted variables separately. Purpose is to identify the most important predictor Variables for each of the predicted variables.
 
-Concludion: We	identified the following most important predictor variables that contribute to bad code review: 1) lines of code, and 2) number of pending code reviews for the reviewer
+Concludion: Technical (patch size, number of chunks, and module) as well as personal factors (reviewer’s
+experience and review queue) strongly contribute to the review quality. We	identified the following most important predictor variables that contribute to bad code review: 1) lines of code, and 2) number of pending code reviews for the reviewer
+
